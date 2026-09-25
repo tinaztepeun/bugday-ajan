@@ -1,0 +1,77 @@
+name: Günlük buğday paylaşımı
+
+on:
+  schedule:
+    - cron: "0 3 * * 1-5"   # Pazartesi-Cuma 06:00 Türkiye saati (03:00 UTC)
+  workflow_dispatch:
+    inputs:
+      deneme:
+        description: "Deneme modu: içerik üretilir ama LinkedIn'e gönderilmez"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: gunluk-paylasim
+  cancel-in-progress: false
+
+jobs:
+  paylasim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TZ: Europe/Istanbul
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Bağımlılıkları kur
+        run: pip install -r requirements.txt
+
+      - name: Ajanları çalıştır (araştır, yaz, görsel, denetle)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python main.py
+
+      - name: Arşivi ve hafızayı depoya kaydet
+        if: always()
+        run: |
+          git config user.name "bugday-ajan"
+          git config user.email "bugday-ajan@users.noreply.github.com"
+          git add -A
+          git commit -m "Günlük içerik: $(date +%F)" || echo "Değişiklik yok"
+          git push
+
+      - name: LinkedIn'e planla (Metricool)
+        if: success() && inputs.deneme != true
+        env:
+          METRICOOL_USER_TOKEN: ${{ secrets.METRICOOL_USER_TOKEN }}
+          METRICOOL_USER_ID: ${{ secrets.METRICOOL_USER_ID }}
+          METRICOOL_BLOG_ID: ${{ secrets.METRICOOL_BLOG_ID }}
+          MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
+        run: |
+          sleep 20
+          python yayinla.py
+
+      - name: Yayın kaydını kaydet
+        if: always() && inputs.deneme != true
+        run: |
+          git add -A
+          git commit -m "Yayın kaydı: $(date +%F)" || echo "Değişiklik yok"
+          git push
+
+      - name: Sorun varsa bildir (GitHub Issue)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Günlük paylaşım yayınlanmadı: $(date +%F)" \
+            --body "Çalışma kaydı: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
