@@ -1,0 +1,89 @@
+# =============================================================
+#  Buğday & Un İçerik Ajanları - Yapılandırma
+#  Bu dosyayı kendi markanıza göre düzenleyin.
+# =============================================================
+
+marka:
+  ad: "Şirket Adınız"            # Görselin üst bandında görünür
+  linkedin_imza: ""              # İsteğe bağlı, gönderi sonuna eklenir (ör. "— Ekibimiz")
+  renkler:
+    ana: "#B8862F"               # Buğday altını
+    koyu: "#3B2F1E"              # Koyu kahve
+    zemin: "#FBF7EF"             # Krem
+    vurgu: "#2E6B4F"             # Yeşil (olumlu değişim)
+    uyari: "#A8402F"             # Kırmızı (olumsuz değişim)
+
+zaman_dilimi: "Europe/Istanbul"
+
+# Haftanın günlerine göre ana tema (0 = Pazartesi). Koordinatör bu temayı esas alır,
+# ancak o gün çok önemli bir gelişme varsa açıyı değiştirebilir.
+haftalik_tema:
+  0: "Türkiye buğday piyasası: TMO, borsalar, hasat, fiyatlar"
+  1: "Dünya buğday piyasası: vadeli fiyatlar, arz-talep, büyük ihracatçılar"
+  2: "Fiyatı etkileyen faktörler: iklim, Karadeniz, kur, navlun, politika"
+  3: "Un sektörü: ihracat, fiyatlar, kapasite, mevzuat, teknoloji"
+  4: "Haftanın özeti: Türkiye + dünya + un sektöründe öne çıkanlar"
+  5: "Haftanın özeti: Türkiye + dünya + un sektöründe öne çıkanlar"
+  6: "Haftanın özeti: Türkiye + dünya + un sektöründe öne çıkanlar"
+
+# Araştırma ajanlarının odakları ve öncelikli kaynak önerileri
+arastirma_ajanlari:
+  turkiye:
+    ad: "Türkiye buğday araştırmacısı"
+    odak: >
+      TMO alım/satış fiyatları ve açıklamaları, Türkiye ürün borsalarında (Konya, Polatlı,
+      Ankara, Eskişehir vb.) ekmeklik ve durum buğdayı işlem fiyatları, TÜİK üretim tahminleri,
+      ekim-hasat durumu, ithalat rejimi ve gümrük kararları, Resmî Gazete düzenlemeleri.
+    kaynaklar: "tmo.gov.tr, tuik.gov.tr, resmigazete.gov.tr, tarimorman.gov.tr, tobb.org.tr, ürün borsası bültenleri, sektörel haber siteleri"
+  dunya:
+    ad: "Dünya buğday araştırmacısı"
+    odak: >
+      CBOT/Euronext (MATIF) buğday vadeli fiyatları, USDA WASDE raporları, IGC ve FAO tahminleri,
+      Rusya/Ukrayna/AB/ABD/Avustralya/Arjantin arz durumu, Karadeniz ihracat fiyatları,
+      iklim ve rekolte riskleri, ihracat kotaları ve vergileri, navlun, dolar kuru.
+    kaynaklar: "usda.gov, igc.int, fao.org, reuters.com, agriculture.ec.europa.eu, cmegroup.com"
+  un:
+    ad: "Un sektörü araştırmacısı"
+    odak: >
+      Türkiye un ihracatı (miktar, değer, pazarlar), un fiyatları, dahilde işleme rejimi (DİR),
+      sektör birlikleri açıklamaları, kapasite ve kapasite kullanım oranları, gıda güvenliği ve
+      mevzuat, değirmen teknolojileri, dünya un ticareti.
+    kaynaklar: "tusaf.org, tim.org.tr, trade map, sektörel dergiler, ticaret.gov.tr"
+
+# Model seçimi. Denetçi için daha güçlü model önerilir.
+modeller:
+  koordinator: "claude-sonnet-5"
+  arastirmaci: "claude-sonnet-5"
+  yazar: "claude-sonnet-5"
+  gorsel: "claude-sonnet-5"
+  denetci: "claude-opus-5-5"
+
+arastirma:
+  derin_arama_limiti: 8          # "derin" görevlerde en fazla web araması
+  hizli_arama_limiti: 3          # "hızlı" tarama görevlerinde
+
+denetim:
+  en_fazla_revizyon: 2           # Denetçi reddederse kaç kez düzeltme denensin
+  asgari_puan: 8                 # 10 üzerinden, bunun altı yayınlanmaz
+
+# Yazım stili (yazar ve denetçi ajanlar bunu esas alır)
+stil: |
+  - Profesyonel, sade, veriye dayalı bir dil. Abartı, clickbait ve spekülasyon yok.
+  - Her rakamın tarihi ve birimi açık olsun (ör. "25 Eylül itibarıyla, TL/ton").
+  - Kesinlikle al/sat tavsiyesi veya fiyat tahmini "garantisi" verme.
+  - İlk cümle dikkat çeken ama doğru bir tespit olsun.
+  - Kısa paragraflar; LinkedIn'de okunabilirlik için 2-3 cümlelik bloklar.
+  - En fazla 3-5 hashtag.
+  - İngilizce metin, Türkçe metnin çevirisi değil; aynı içeriğin uluslararası okur için
+    doğal yazılmış hâli olsun.
+
+uzunluk:
+  tr_azami: 1400                 # karakter
+  en_azami: 1200
+  toplam_azami: 2900             # LinkedIn sınırı 3000
+
+yayin:
+  mod: "otomatik"                # "otomatik" = zamanında yayınlar, "taslak" = Metricool'da taslak bırakır
+  saat: "09:30"                  # Türkiye saati. İş akışı 06:00'da çalışır, arada kontrol penceresi kalır
+  kaynaklari_ilk_yoruma_yaz: true   # Linkler gönderi erişimini düşürdüğü için kaynaklar ilk yorumda
+  uyari_notu: "Bilgilendirme amaçlıdır, yatırım tavsiyesi değildir. / For information only, not investment advice."
